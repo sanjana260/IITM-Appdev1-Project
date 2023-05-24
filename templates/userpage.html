@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{user.Username}}</title>
+    <link rel="icon" type="image/x-icon" href="/static/assets/logo.png">
+    <link href="/static/css/custom.css" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/7f4d04ff57.js" crossorigin="anonymous"></script>
+</head>
+<body>
+    <nav class="navbar navbar-expand shadow-sm ps-3 pe-4 sticky-top bg-light ">
+        <a href="/home" class="navbar-brand">
+          <span class="fw-bold text-muted" >Blog</span><span class="fw-bold text-primary">Lite</span>
+        </a>
+        <ul class="navbar-nav ms-auto">
+            <li class="nav-item pe-2">
+                <a href="/home" class="nav-link">
+                    <i class="fa-sharp fa-solid fa-house"></i>
+                </a>
+            </li>
+            <li class="nav-item pe-2">
+                <a href="/profile" class="nav-link">
+                    <i class="fa-solid fa-user"></i>
+                </a>
+            </li>
+        </ul>
+      </nav>
+    
+    <div class="container-sm my-3">
+        <div class="row border p-2">
+            <div class="col-sm-3  my-auto">
+                <h2 class="text-dark fw-bold">{{user.Username}}</h2>
+                <p class="text-lead">{{user.About}} </p>
+            </div>
+            <div class="col-sm-9">
+                <div class="row py-sm-5 ps-2 pe-2">
+                    <div class="col">
+                        <p class="text-center fw-bold text-dark my-0">{{user.Blogs|length}}</p>
+                        <p class="text-center fw-bold">Posts</p>
+                    </div>
+                    <div class="col" style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#followersModal">
+                        <p class="text-center fw-bold text-dark my-0">{{user.Followers|length}}</p>
+                        <p class="text-center fw-bold">Followers</p>
+                    </div>
+                    <div class="col" style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#followingModal">
+                        <p class="text-center fw-bold text-dark my-0">{{user.Following|length}}</p>
+                        <p class="text-center fw-bold">Following</p>
+                    </div>
+                </div>
+                <div class="row ps-2 pe-2" style="margin-bottom: 5%">
+                    {% if not following %}
+                    <a href="/follow/{{user.id}}?redirect=/user/{{user.id}}" type="button" class="btn btn-primary text-dark fw-bold shadow-sm">Follow</a>
+                    {% else %}
+                    <a href = "/unfollow/{{user.id}}?redirect=/user/{{user.id}}" type="button" class="btn btn-outline-primary text-dark fw-bold shadow-sm">Unfollow</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="row my-3">
+            {% if bloglist|length>0 %}
+            <div class="container-fluid px-4">
+                <div class="row p-0 gx-5">
+                    {% for post in bloglist %}
+                    <div class = 'col-4 shadow-sm p-0 border' onclick="location.href='/blog/{{post.id}}';">
+                        <div class="container-fluid" style="padding-top:100%; width: 100%; background-image: url('/static/images/{{post.ImageURL}}'); background-repeat: no-repeat;background-size: cover; background-position: center center;"></div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+  
+    <!-- Followers Modal -->
+  <div class="modal fade" id="followersModal" tabindex="-1" aria-labelledby="followersModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 class="modal-title fs-5" id="followersModalLabel">Followers</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          {% for follower in user.Followers %}
+          <div class="row my-2 d-flex align-items-center" style="min-height: 35px;">
+            <div class="col">
+                <a href="/user/{{follower.id}}" class="text-dark fw-bold" style="text-decoration: none;">{{follower.Username}}</a>
+            </div>
+            {% if follower!=current_user %}
+                {% if follower in current_user.Following %}
+                <div class="col d-flex justify-content-end">
+                    <a href="/unfollow/{{follower.id}}?redirect=/user/{{user.id}}" class="btn btn-outline-primary text-dark">Unfollow</a>
+                </div>
+                {% else %}
+                <div class="col d-flex justify-content-end">
+                    <a href="/follow/{{follower.id}}?redirect=/user/{{user.id}}" class="btn btn-primary">Follow</a>
+                </div>
+                {% endif %}
+            {% endif %}
+          </div>
+          {% endfor %}
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Following Modal -->
+  <div class="modal fade" id="followingModal" tabindex="-1" aria-labelledby="followingModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 class="modal-title fs-5" id="followingModalLabel">Following</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          {% for folowing in user.Following %}
+          <div class="row m-1 p-1 d-flex align-items-center" style="min-height: 35px;">
+            <div class="col">
+                <a href="/user/{{folowing.id}}" class="text-dark fw-bold" style="text-decoration: none;">{{folowing.Username}}</a>
+            </div>
+            {% if folowing!=current_user %}
+                {% if folowing in current_user.Following %}
+                <div class="col d-flex justify-content-end">
+                    <a href="/unfollow/{{folowing.id}}?redirect=/user/{{user.id}}" class="btn btn-outline-primary text-dark">Unfollow</a>
+                </div>
+                {% else %}
+                <div class="col d-flex justify-content-end">
+                    <a href="/follow/{{folowing.id}}?redirect=/user/{{user.id}}" class="btn btn-primary">Follow</a>
+                </div>
+                {% endif %}
+            {% endif %}
+          </div>
+          {% endfor %}
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js" integrity="sha384-cuYeSxntonz0PPNlHhBs68uyIAVpIIOZZ5JqeqvYYIcEL727kskC66kF92t6Xl2V" crossorigin="anonymous"></script></body>
+
+</body>
+</html>

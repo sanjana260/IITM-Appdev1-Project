@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Blog</title>
+    <link rel="icon" type="image/x-icon" href="/static/assets/logo.png">
+    <link href="/static/css/custom.css" rel="stylesheet">
+    <script>
+        function showPreview(event){
+        if(event.target.files.length > 0){
+          var src = URL.createObjectURL(event.target.files[0]);
+          var preview = document.getElementById("preview");
+          preview.src = src;
+          preview.style.display = "block";
+        }
+      }
+    </script>
+    <script src="https://kit.fontawesome.com/7f4d04ff57.js" crossorigin="anonymous"></script>
+</head>
+<body>
+    <div class="container my-4">
+        <div class="row">
+            <div class="col d-flex flex-row">
+                <p onclick="history.back()" class="link-dark fw-bold" style="cursor: pointer;">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </p>
+                <p class="text-dark ms-3 fw-bold">Edit Blog</p>
+            </div>
+            <div class="col justify-content-end d-flex">
+                <a href="/home" class="text-dark" style="cursor: pointer;">
+                    <i class="fa-sharp fa-solid fa-house"></i>
+                </a>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6 d-flex justify-content-center align-items-center border">
+                <img id="preview" src="/static/images/{{blog.ImageURL}}" alt="Image preview" class=" img-fluid">
+            </div>
+            <div class="col">
+                <form method = "POST" action = "" enctype="multipart/form-data">
+                    {{ form.hidden_tag() }}
+                    {{ form.title(class="form-control",value = blog.Title) }}
+                    <br>
+                    {{ form.caption(class="form-control",value = blog.Caption) }}
+                    <br>
+                    {{ form.image(class="form-control",onchange="showPreview(event)") }}
+                    <br>
+                    <ul>
+                        {% for error in form.image.errors %}
+                        <li>{{error}}</li>
+                        {% endfor %}
+                    </ul>
+                    {{ form.submit(class="btn btn-outline-primary container-fluid") }}
+                </form>
+            </div>
+            
+        </div>
+       
+    </div>
+    
+</body>
+</html>

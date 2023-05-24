@@ -1,0 +1,445 @@
+openapi: 3.0.0
+info:
+  title: BlogLite API
+  description: 
+    <p>API specifications for the BlogLite application created for the final project of MAD-I</p>
+  
+    <h3> Error Codes </h3> 
+    <table>
+      <thead>
+        <th>Resource</th>
+        <th>Error Code</th>
+        <th>Message</th>
+      </thead>
+      <tbody>
+      <tr>
+        <td>Blog</td>
+        <td>BLOG01</td>
+        <td>Blog Title is required</td>
+      </tr>
+      <tr>
+        <td>Blog</td>
+        <td>BLOG02</td>
+        <td>Blog Image is required</td>
+      </tr>
+      <tr>
+        <td>Blog</td>
+        <td>BLOG03</td>
+        <td>User ID is required</td>
+      </tr>
+      <tr>
+        <td>Blog</td>
+        <td>BLOG04</td>
+        <td>User does not exist</td>
+      </tr>
+      
+      <tr>
+        <td>User</td>
+        <td>USER01</td>
+        <td>Username already exists</td>
+      </tr>
+      <tr>
+        <td>User</td>
+        <td>USER02</td>
+        <td>Email already exists</td>
+      </tr>
+      
+      <tr>
+        <td>User</td>
+        <td>USER03</td>
+        <td>Username is required</td>
+      </tr>
+      <tr>
+        <td>User</td>
+        <td>USER04</td>
+        <td>Email is required</td>
+      </tr> 
+      <tr>
+        <td>User</td>
+        <td>USER05</td>
+        <td>Username is too short</td>
+      </tr>
+      <tr>
+        <td>User</td>
+        <td>USER06</td>
+        <td>Password is too short</td>
+      </tr> 
+      <tr>
+        <td>User</td>
+        <td>USER07</td>
+        <td>Password is required</td>
+      </tr>
+    </tbody>
+    </table>
+  version: 1.0.0
+servers:
+  - url: http://127.0.0.1:8000
+paths: 
+  /api/image/{ImageURL}:
+    description: End point fetch images for blog, where the filename of image = ImageURL.
+    get:
+      description: Operation to fetch an image file from the server
+      parameters:
+        - in: path
+          name: ImageURL
+          required: true
+          schema:
+            type: string
+            example: Summer.png
+      responses:
+        '200':
+          description: Image fetched successfully
+          content:
+            image/*:
+              schema:
+                title: Image file
+                type: string
+                format: binary
+        '500':
+          description: Internal Server Error
+        '404':
+          description: Image not found
+  /api/blog/{blog_id}:
+    description: End point to read, update and delete a Blog resource with blog_id = Blog Id.
+    get:
+      description: Operation to Read Blog resource.
+      parameters:
+        - in: path
+          name: blog_id
+          required: true
+          schema:
+            type: integer
+            example: 8
+      responses:
+        '200':
+          description: Blog read successful
+          content:
+            application/json:
+              schema:
+                title: blog object
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 8
+                  Title:
+                    type: string
+                    example: Summer
+                  Caption:
+                    type: string
+                    example: This blog is about summer! Summer is wonderful.
+                  ImageURL:
+                    type: string
+                    example: Summer.png
+                  user_id:
+                    type: integer
+                    example: 2
+        '500':
+          description: Internal Server Error
+        '404':
+          description: Blog not found
+
+    put:
+      description: Operation to Update the Blog resource.
+      parameters:
+        - in: path
+          name: blog_id
+          required: true
+          schema:
+            type: integer
+            example: 8
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                Title:
+                  type: string
+                  example: Summer
+                Caption:
+                  type: string
+                  example: This blog is about summer!
+                Image:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Successfuly updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 8
+                  Title:
+                    type: string
+                    example: Summer
+                  Caption:
+                    type: string
+                    example: This blog is about summer!
+                  ImageURL:
+                    type: string
+                    example: Summer.png
+                  user_id:
+                    type: integer 
+                    example: 1
+        '404':
+          description: Blog not found
+        '500':
+          description: Internal Server Error
+    delete:
+      description: Operation to delete the Blog resource
+      parameters:
+        - in: path
+          name: blog_id
+          required: true
+          schema:
+            type: integer
+            example: 8
+      responses:
+        '200':
+          description: Successfully Deleted
+        '404':
+          description: Blog was not found
+        '500':
+          description: Intenal Server Error
+
+  /api/blog:
+    description: End point to create blog resource
+    post:
+      description: Operation to create the blog resource
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                Title:
+                  type: string
+                  example: Summer
+                Caption:
+                  type: string
+                  example: This blog is about summer!
+                user_id:
+                  type: integer 
+                  example: 1
+                Image:
+                  type: string
+                  format: binary
+      responses:
+        '201':
+          description: Successfully Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 8
+                  Title:
+                    type: string
+                    example: Summer
+                  Caption:
+                    type: string
+                    example: This blog is about summer!
+                  ImageURL:
+                    type: string
+                    example: Summer.png
+                  user_id:
+                    type: integer
+                    example: 1
+        '500':
+          description: Internal Server Error
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error_code:
+                    type: string
+                    example: BLOG01
+                  error_message:
+                    type: string 
+                    example: Blog title is required
+  /api/user/{user_id}:
+    description: Url to read, update and delete the User resource.
+    get:
+      description: Operation to read User resource
+      parameters:
+        - in: path
+          name: user_id
+          required: true
+          schema:
+            type: integer
+            example: 2
+      responses:
+        '200':
+          description: Request Successful
+          content:
+            application/json:
+              schema:
+                title: User object
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 2
+                  Username:
+                    type: string
+                    example: Test123
+                  email:
+                    type: string
+                    example: test@example.com
+                  About:
+                    type: string
+                    example: Lorem ipsum dolor sit amet consectetur adipisicing elit. Pariatur, assumenda!
+        '500':
+          description: Internal server error
+        '404':
+          description: User not found
+
+    put:
+      description: Operation to update the user resource
+      parameters:
+        - in: path
+          name: user_id
+          required: true
+          schema:
+            type: integer
+            example: 2
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                Username:
+                  type: string
+                  example: Test123
+                Password: 
+                  type: string
+                  example: Password@123
+                email:
+                  type: string
+                  example: test@example.com
+                About:
+                  type: string
+                  example: Lorem ipsum dolor sit amet consectetur adipisicing elit. Pariatur, assumenda!
+      responses:
+        '200':
+          description: Successfully updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 2
+                  Username:
+                    type: string
+                    example: Test123
+                  email:
+                    type: string
+                    example: test@example.com
+                  About:
+                    type: string
+                    example: Lorem ipsum dolor sit amet consectetur adipisicing elit. Pariatur, assumenda!
+        '404':
+          description: User not found
+        '500':
+          description: Internal Server Error
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error_code:
+                    type: string
+                    example: USER01
+                  error_message:
+                    type: string
+                    example: Username already exists
+    delete:
+      description: Operation to delete the user resource
+      parameters:
+        - in: path
+          name: user_id
+          required: true
+          schema:
+            type: integer
+            example: 2
+      responses:
+        '201':
+          description: Successfully Deleted
+        '500':
+          description: Internal Server Error
+        '404':
+          description: User not found
+
+  /api/user:
+    description: Url to create user resource
+    post:
+      description: Operation to create the student resource
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                Username:
+                  type: string
+                  example: Test123
+                Password:
+                  type: string 
+                  example: Password@123
+                email:
+                  type: string
+                  example: test@example.com
+                About:
+                  type: string
+                  example: Lorem ipsum dolor sit amet consectetur adipisicing elit. Pariatur, assumenda!
+      responses:
+        '201':
+          description: Successfully Created
+          content:
+            application/json:
+              schema:
+                title: User object
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 2
+                  Username:
+                    type: string
+                    example: Test123
+                  email:
+                    type: string
+                    example: test@example.com
+                  About:
+                    type: string
+                    example: Lorem ipsum dolor sit amet consectetur adipisicing elit. Pariatur, assumenda!
+        '500':
+          description: Internal Server Error
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error_code:
+                    type: string
+                    example: USER01
+                  error_message:
+                    type: string
+                    example: Username does not exist

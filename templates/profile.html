@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{current_user.Username}}</title>
+    <link rel="icon" type="image/x-icon" href="/static/assets/logo.png">
+    <link href="/static/css/custom.css" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/7f4d04ff57.js" crossorigin="anonymous"></script>
+</head>
+<body>
+    <nav class="navbar navbar-expand text-end shadow-sm ps-3 pe-3 sticky-top bg-light">
+        <a href="/home" class="navbar-brand">
+          <span class="fw-bold text-muted" >Blog</span><span class="fw-bold text-primary">Lite</span>
+        </a>
+        <ul class="navbar-nav ms-auto">
+            <li class="nav-item pe-2">
+                <a href="/home" class="nav-link">
+                    <i class="fa-sharp fa-solid fa-house"></i>
+                </a>
+            </li>
+            <li class="nav-item pe-2">
+                <a href="/create_blog" class="nav-link">
+                    <i class="fa-solid fa-plus fw-bold h4 m-0 p-0"></i>
+                </a>
+            </li>
+        </ul>
+      </nav>
+    
+    <div class="container-sm my-3">
+        <div class="row border p-2">
+            <div class="col-sm-3  my-auto">
+                <a href="/edit_profile" class="text-dark">
+                    <i class="fa-solid fa-pen"></i>
+                </a>
+                <h2 class="text-dark fw-bold">{{current_user.Username}}</h2>
+                <p class="text-lead">{{current_user.About}} </p>
+            </div>
+            <div class="col-sm-9">
+                <div class="row py-sm-5 ps-2 pe-2">
+                    <div class="col">
+                        <p class="text-center fw-bold text-dark my-0">{{current_user.Blogs|length}}</p>
+                        <p class="text-center fw-bold">Posts</p>
+                    </div>
+                    <div style="cursor: pointer;" class="col" data-bs-toggle="modal" data-bs-target="#followersModal">
+                        <p class="text-center fw-bold text-dark my-0">{{current_user.Followers|length}}</p>
+                        <p class="text-center fw-bold">Followers</p>
+                    </div>
+                    <div class="col" style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#followingModal">
+                        <p class="text-center fw-bold text-dark my-0">{{current_user.Following|length}}</p>
+                        <p class="text-center fw-bold">Following</p>
+                    </div>
+                </div>
+                <div class=" ps-2 pe-2 d-flex flex-row" style="margin-bottom: 5%">
+                    <a class="btn btn-outline-primary text-dark flex-grow-1 fw-bold shadow-sm" data-bs-toggle="modal" data-bs-target="#logoutModal">Logout</a>
+                    <a style="cursor: pointer;" class="text-dark fs-5 ms-2" data-bs-toggle="modal" data-bs-target="#deleteModal"><i class="fa-solid fa-trash-can"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="row my-3">
+            {% if bloglist|length>0 %}
+            <div class="container-fluid px-4">
+                <div class="row p-0 gx-5">
+                    {% for post in bloglist %}
+                    <div class = 'col-4 shadow-sm p-0 border' onclick="location.href='/blog/{{post.id}}';">
+                        <div class="container-fluid" style="padding-top:100%; width: 100%; background-image: url('/static/images/{{post.ImageURL}}'); background-repeat: no-repeat;background-size: cover; background-position: center center;"></div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+  
+  <!-- Logout Modal -->
+  <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 class="modal-title fs-5" id="logoutModalLabel">Logout</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          Do you want to log out?
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Close</button>
+          <a href = "/logout"type="button" class="btn btn-primary text-dark">Logout</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Modal -->
+  <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 class="modal-title fs-5" id="deleteModalLabel">Delete Account</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          Are you sure you want to delete your account? All your data will be lost
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Close</button>
+          <a href = "/delete_account"type="button" class="btn btn-danger">Delete</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Followers Modal -->
+  <div class="modal fade" id="followersModal" tabindex="-1" aria-labelledby="followersModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 class="modal-title fs-5" id="followersModalLabel">Followers</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          {% for follower in current_user.Followers %}
+          <div class="row m-1 p-1 d-flex align-items-center" style="min-height: 35px;">
+            <div class="col">
+                <a href="/user/{{follower.id}}" class="text-dark fw-bold" style="text-decoration: none;">{{follower.Username}}</a>
+            </div>
+            {% if follower in current_user.Following %}
+            <div class="col d-flex justify-content-end">
+                <a href="/unfollow/{{follower.id}}?redirect=/profile" class="btn btn-outline-primary text-dark">Unfollow</a>
+            </div>
+            {% else %}
+            <div class="col d-flex justify-content-end">
+                <a href="/follow/{{follower.id}}?redirect=/profile" class="btn btn-primary">Follow</a>
+            </div>
+            {% endif %}
+          </div>
+          {% endfor %}
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Following Modal -->
+  <div class="modal fade" id="followingModal" tabindex="-1" aria-labelledby="followingModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 class="modal-title fs-5" id="followingModalLabel">Following</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          {% for following in current_user.Following %}
+          <div class="row m-1 p-1 d-flex align-items-center" style="min-height: 35px;">
+            <div class="col">
+                <a href="/user/{{following.id}}" class="text-dark fw-bold" style="text-decoration: none;">{{following.Username}}</a>
+            </div>
+            <div class="col d-flex justify-content-end">
+                <a href="/unfollow/{{following.id}}?redirect=/profile" class="btn btn-outline-primary text-dark">Unfollow</a>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js" integrity="sha384-cuYeSxntonz0PPNlHhBs68uyIAVpIIOZZ5JqeqvYYIcEL727kskC66kF92t6Xl2V" crossorigin="anonymous"></script></body>
+
+</body>
+</html>

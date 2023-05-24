@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BlogLite</title>
+    <link rel="icon" type="image/x-icon" href="/static/assets/logo.png">
+    <link href="static/css/custom.css" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/7f4d04ff57.js" crossorigin="anonymous"></script>
+    <script>
+    </script>
+</head>
+<body>
+    <nav class="navbar shadow-sm ps-3 pe-4 sticky-top bg-light">
+        <a href="/home" class="navbar-brand">
+          <span class="fw-bold text-muted" >Blog</span><span class="fw-bold text-primary">Lite</span>
+        </a>
+        
+        <ul class="navbar-nav">
+            <li class="nav-item">
+                <a href="/profile" class="nav-link">
+                    <i class="fa-solid fa-user"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <div class="container pt-3">
+
+        <div class="container-fluid mt-auto py-5 rounded" style="background-image: url('/static/assets/bloglite_background_1.jpg'); background-repeat: no-repeat;background-size: cover;">
+            <h2 class="text-white fw-bold ps-2">Welcome, {{current_user.Username}}!</p>
+        </div>
+        
+        <form class="d-flex mt-2" method="GET" action = "/search">
+            {{form.hidden_tag()}}
+            {{form.search(class="form-control me-2")}}
+            {{form.submit(class="btn btn-outline-dark")}}
+        </form>
+        
+        {% if posts|length>0 %}
+        <div class="container-fluid my-4 ms-2">
+            <div class="row p-0 ">
+                {% for post in posts %}
+                <div class = 'col-lg-4 col-md-6 p-0 border rounded' >
+                    <div class="container-fluid" style="padding-top:100%; width: 100%; background-image: url('/static/images/{{post.ImageURL}}'); background-repeat: no-repeat;background-size: cover; background-position: center center;" onclick="location.href='/blog/{{post.id}}';"></div>
+                    <div class="row mt-2 p-2">
+                        <div class="col-10">
+                            <a href="/user/{{post.user_id}}"class="link-dark fw-bold pb-0 pt-2 m-0" style="text-decoration: none;">{{post.user.Username}}</a> : {{ post.Title }}
+                        </div>
+                        <div class="col d-flex justify-content-end fs-5">
+                            <p class="small me-2" style="margin-top: 2px;">
+                                {{post.liked_by|length}}
+                            </p>
+                            {% if current_user not in post.liked_by %}
+                            <a href="/post/like/{{post.id}}?redirect=/home" class="link-dark">
+                                <i class="fa-regular fa-heart"></i>
+                            </a>
+                            {% else %}
+                            <a href="/post/unlike/{{post.id}}?redirect=/home" class="link-dark">
+                                <i class="fa-solid fa-heart"></i>
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="container-fluid mt-auto" style="size: 3px;">
+                        <p class="text-muted text-end small">{{post.TimeStamp.day}}/{{post.TimeStamp.month}}/{{post.TimeStamp.year}}</p>
+                    </div>
+                </div>
+
+                {% endfor %}
+            </div>
+        </div>
+        {% else %}
+        <div class="my-4">
+            There are no posts here. Discover new users using the search bar to see their posts!
+        </div>
+        {% endif %}
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
+</body>
+</html>

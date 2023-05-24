@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{blog.Title}}</title>
+    <link rel="icon" type="image/x-icon" href="/static/assets/logo.png">
+    <link href="/static/css/custom.css" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/7f4d04ff57.js" crossorigin="anonymous"></script>
+    <style>
+      .comment-box{
+        width:80%;
+        border: solid 1px rgb(223, 223, 223);
+        padding:1%;
+      }
+      .comment-box:focus{
+        border:solid 1px rgb(205, 205, 205);
+      }
+    </style>
+</head>
+<body>
+    <div class="container my-4">
+        <div class="row">
+            <div class="col d-flex flex-row">
+                <p onclick="history.back()" class="link-dark fw-bold" style="cursor: pointer;">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </p>
+                <a href = '/home' class="link-dark fw-bold ms-3" style="cursor: pointer;">
+                  <i class="fa-sharp fa-solid fa-house"></i>
+                </a>
+                <a href="/user/{{blog.user.id}}" class="text-dark fw-bold ms-3" style="text-decoration: none;">
+                    {{blog.user.Username}}
+                </a>
+            </div>
+            {% if blog.user_id == current_user.id %}
+            <div class="col justify-content-end d-flex">
+                <a data-bs-toggle="modal" data-bs-target="#deleteModal"class="link-dark" style="cursor: pointer;">
+                    <i class="fa-solid fa-trash-can"></i>
+                </a>
+            </div>
+            {% endif %}
+        </div>
+        <div class="row">
+            <div class="col-md-6 ">
+                <img src="/static/images/{{blog.ImageURL}}" alt="" class=" img-fluid img-thumbnail">
+            </div>
+            <div class="col rounded p-3 d-flex flex-column">
+              <div class="row">
+                <div class="col-10">
+                  <h2 class="text-dark">{{blog.Title}}</h2>
+                </div>
+                
+                <div class="col d-flex justify-content-end fs-5">
+                  <p class="small me-1" style="margin-top: 2px; cursor: pointer;" data-bs-toggle="modal" data-bs-target="#likesModal">
+                    {{blog.liked_by|length}}
+                  </p>
+                  {% if current_user not in blog.liked_by %}
+                  <a href="/post/like/{{blog.id}}?redirect=/blog/{{blog.id}}" class="link-dark">
+                      <i class="fa-regular fa-heart"></i>
+                  </a>
+                  {% else %}
+                  <a href="/post/unlike/{{blog.id}}?redirect=/blog/{{blog.id}}" class="link-dark">
+                      <i class="fa-solid fa-heart"></i>
+                  </a>
+                  {% endif %}
+                </div>
+              </div>
+              <div class="row">
+                <p class="text ">{{blog.Caption}}</p>
+              </div>
+              
+                <div class="row overflow-auto border rounded py-2" style="max-height: 250px">
+                  
+                  {% if blog.comments|length == 0 %} 
+                  <p class="small">No comments yet.</p>
+                  {% else %}
+                  <p class="text-dark small m-0">Comments ({{blog.comments|length}}):</p>
+                  {% endif %}
+                  {% for comment in blog.comments %}
+                  <div class="row" style="height: fit-content;">
+                    <div class="col-10">
+                      <a href="/user/{{comment.user.id}}" class="text-dark fw-bold m-0" style="text-decoration: none;">{{comment.user.Username}}</a>
+                    </div>
+                    {% if comment.user == current_user %}
+                    <div class="col d-flex justify-content-end pt-2">
+                      <a href="/comment/delete/{{comment.id}}" class="text-dark small">
+                        <i class="fa-solid fa-trash-can"></i>
+                      </a>
+                      
+                    </div>
+                    {% endif %}
+                  </div>
+                  <div class="row">
+                    <p class="text-dark small">{{comment.comment}}</p>
+                  </div>
+                  
+                  {% endfor %}
+                </div>
+                <form class="my-2 d-flex flex-row"action="" method = "POST">
+                  {{form.hidden_tag()}}
+                  {{form.comment(class="comment-box flex-grow-1")}} 
+                  {{form.submit(class='btn btn-outline-dark small', style="")}}
+                </form>
+                {% if blog.user_id == current_user.id %}
+                <div class="container-fluid d-flex align-items-end mt-4" >
+                    <a href="/blog/edit/{{blog.id}}" class="container-fluid btn btn-outline-primary text-dark fw-bold shadow-sm">Edit</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <!-- Delete Modal -->
+  <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 class="modal-title fs-5" id="deleteModalLabel">Delete</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          Are you sure you want to delete this blog?
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Close</button>
+          <a href = "/blog/delete/{{blog.id}}"type="button" class="btn btn-primary text-dark">Delete</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Likes Modal -->
+  <div class="modal fade" id="likesModal" tabindex="-1" aria-labelledby="likesModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 class="modal-title fs-5" id="likesModalLabel">Liked by</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          {% for liker in blog.liked_by %}
+          <div class="row m-1 p-1">
+            <div class="col">
+                <a href="/user/{{liker.id}}" class="text-dark fw-bold" style="text-decoration: none;">{{liker.Username}}</a>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js" integrity="sha384-cuYeSxntonz0PPNlHhBs68uyIAVpIIOZZ5JqeqvYYIcEL727kskC66kF92t6Xl2V" crossorigin="anonymous"></script></body>
+
+</body>
+</html>
